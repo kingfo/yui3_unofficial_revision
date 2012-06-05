@@ -8,6 +8,8 @@ CVS/
 .DS_Store
 .*.swp
 .svn
+*.lxml
+*.as3proj
 *~
 src/build.log
 .com.apple.timemachine.supported

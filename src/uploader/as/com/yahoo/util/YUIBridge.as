@@ -1,9 +1,9 @@
 package com.yahoo.util
  {
 		import flash.display.Stage;
-		import flash.external.ExternalInterface;
 		import flash.utils.getDefinitionByName;
 	    import flash.system.Security;
+		import web.security.external.SecurityExternalInterface;
 		
 		public class YUIBridge extends Object
 		{
@@ -21,7 +21,7 @@ package com.yahoo.util
                 _stage = stage;
 				flashvars = _stage.loaderInfo.parameters;
 				
-				if (flashvars["yId"] && flashvars["YUIBridgeCallback"] && flashvars["YUISwfId"] && ExternalInterface.available) {
+				if (flashvars["yId"] && flashvars["YUIBridgeCallback"] && flashvars["YUISwfId"] && SecurityExternalInterface.available) {
 					_jsHandler = flashvars["YUIBridgeCallback"];
 					_swfID = flashvars["YUISwfId"];
 					_yId = flashvars["yId"];
@@ -32,10 +32,10 @@ package com.yahoo.util
                     Security.allowDomain(flashvars.allowedDomain);
                 }
                 
-				ExternalInterface.addCallback("createInstance", createInstance);
-				ExternalInterface.addCallback("exposeMethod", exposeMethod);
-				ExternalInterface.addCallback("getProperty", getProperty);
-				ExternalInterface.addCallback("setProperty", setProperty);
+				SecurityExternalInterface.addCallback("createInstance", createInstance);
+				SecurityExternalInterface.addCallback("exposeMethod", exposeMethod);
+				SecurityExternalInterface.addCallback("getProperty", getProperty);
+				SecurityExternalInterface.addCallback("setProperty", setProperty);
 				
 			}
 
@@ -71,8 +71,8 @@ package com.yahoo.util
 			public function exposeMethod(instanceId:String, methodName:String, exposedName:String = "") : void {
 				exposedName == "" ? exposedName = methodName : exposedName = exposedName;
 				
-				if (_instances[instanceId] && ExternalInterface.available) {
-					ExternalInterface.addCallback(exposedName, _instances[instanceId][methodName]);
+				if (_instances[instanceId] && SecurityExternalInterface.available) {
+					SecurityExternalInterface.addCallback(exposedName, _instances[instanceId][methodName]);
 				}
 			}
 			
@@ -92,25 +92,25 @@ package com.yahoo.util
 			}
 
 			public function addCallbacks (callbacks:Object) : void {
-					if (ExternalInterface.available) {
+					if (SecurityExternalInterface.available) {
 						for (var callback:String in callbacks) {
 							trace("Added callback for " + callback + ", function " + callbacks[callback]);
-		 					ExternalInterface.addCallback(callback, callbacks[callback]);
+		 					SecurityExternalInterface.addCallback(callback, callbacks[callback]);
 		 				}
 		 				sendEvent({type:"swfReady"});
 		 			}
 				}
 
 			public function sendEvent (evt:Object) : void {
-					if (ExternalInterface.available) {				
-						ExternalInterface.call("YUI.applyTo", _yId, _jsHandler, [_swfID, evt]);
+					if (SecurityExternalInterface.available) {				
+						SecurityExternalInterface.call("YUI.applyTo", _yId, _jsHandler, [_swfID, evt]);
 					}
 
 			}
 			
 			public function log (message : String) : void {
-				if (ExternalInterface.available) {
-					ExternalInterface.call("console.log", message);
+				if (SecurityExternalInterface.available) {
+					SecurityExternalInterface.call("console.log", message);
 				}
 			}		
 		}
