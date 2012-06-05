@@ -11,8 +11,9 @@ package com.yui.util
     import flash.net.URLRequestHeader;
     import flash.net.URLLoader;
     import flash.net.URLVariables;
+	import flash.utils.setTimeout;
     import flash.utils.Timer;
-    import flash.external.ExternalInterface;
+	import web.security.external.SecurityExternalInterface; // fix  flash XSS. kingfo <oicuicu@gmail.com>
 
     public class io extends Sprite
     {
@@ -21,13 +22,20 @@ package com.yui.util
         private var httpTimeout:Function;
         private var loaderMap:Object = {};
         private var vars:Object = root.loaderInfo.parameters;
+		private var timeid:uint;
 
         public function io() {
-            ExternalInterface.addCallback("send", send);
-            ExternalInterface.addCallback("abort", abort);
-            ExternalInterface.addCallback("isInProgress", isInProgress);
-            ExternalInterface.call('YUI.applyTo', vars.yid, 'io.xdrReady', [vars.yid, vars.uid]);
+			timeid = setTimeout(init, 100); //fix ie6 or some ie shell browser bug.  kingfo <oicuicu@gmail.com>
+           
         }
+		
+		private function init():void {
+			SecurityExternalInterface.watch(this);
+			SecurityExternalInterface.addCallback("send", send);
+            SecurityExternalInterface.addCallback("abort", abort);
+            SecurityExternalInterface.addCallback("isInProgress", isInProgress);
+            SecurityExternalInterface.call('YUI.applyTo', vars.yid, 'io.xdrReady', [vars.yid, vars.uid]);
+		}
 
         public function send(uri:String, cfg:Object):void {
             var loader:URLLoader = new URLLoader(),
@@ -163,7 +171,7 @@ package com.yui.util
         }
 
         private function dispatch(a:Object):void {
-            ExternalInterface.call('YUI.applyTo', vars.yid, 'io.xdrResponse', a);
+            SecurityExternalInterface.call('YUI.applyTo', vars.yid, 'io.xdrResponse', a);
         }
 
         private function setRequestHeaders(request:URLRequest, headers:Object):void {
