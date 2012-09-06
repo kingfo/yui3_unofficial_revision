@@ -3,7 +3,6 @@
 {
 
 	import com.yahoo.util.YUIBridge;
-	
 	import flash.display.Loader;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
@@ -17,14 +16,16 @@
 	import flash.events.MouseEvent;
 	import flash.events.ProgressEvent;
 	import flash.events.SecurityErrorEvent;
-	import flash.external.ExternalInterface;
 	import flash.net.FileFilter;
 	import flash.net.FileReference;
 	import flash.net.FileReferenceList;
 	import flash.net.URLRequest;
 	import flash.net.URLVariables;
 	import flash.ui.Keyboard;
-	import flash.utils.Dictionary; 
+	import flash.utils.Dictionary;
+	import flash.utils.setTimeout;
+	import web.security.external.SecurityExternalInterface;
+	
 
 
 
@@ -41,10 +42,16 @@
 	//--------------------------------------
 	//  Constructor
 	//--------------------------------------
-
+	private var timeid:uint;
 		public function Uploader()
 		{
 			super();
+			timeid = setTimeout(init, 100); // fix ie6 or ie-shell initialization bug
+			
+		}
+		
+		private function init():void {
+			SecurityExternalInterface.watch(this);
 			yuiBridge = new YUIBridge(this.stage);
 			logMessage("Initializing uploader...");
 			initializeComponent();

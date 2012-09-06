@@ -83,3 +83,5 @@ build/datatable-base-deprecated/assets/datatable-base-core.css
 build/datatable-datasource-deprecated/assets/
 build/datatable-scroll-deprecated/assets/
 build/datatable-sort-deprecated/assets/
+
+obj/
